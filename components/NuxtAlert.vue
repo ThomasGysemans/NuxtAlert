@@ -107,7 +107,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div :class="theme === undefined || !knownTheme ? Themes.DEFAULT : theme">
+  <div class="nuxtalert" :class="theme === undefined || !knownTheme ? Themes.DEFAULT : theme">
     <div class="shader" :class="nuxtAlert.handlers.isOpen() ? 'open' : ''" @click="((nuxtAlert.getOptions().allowOutsideClick ?? true) && !isLoading()) ? nuxtAlert.handlers.close({confirmed:false,denied:false,cancelled:false}) : undefined" />
     <div class="popup" :class="nuxtAlert.handlers.isOpen() ? 'open' : ''" aria-modal="true" :aria-hidden="nuxtAlert.handlers.isOpen()" role="dialog" aria-labelledby="alert-title">
       <div class="container-icon">
@@ -184,23 +184,23 @@ $iconSize: 110px;
   }
 }
 
-.container-icon svg.confirm-icon path {
+.nuxtalert .container-icon svg.confirm-icon path {
   stroke-dasharray: 800px;
   stroke-dashoffset: 800px;
   animation: lineanim 2.4s ease forwards;
 }
 
-.container-icon svg.confirm-icon g {
+.nuxtalert .container-icon svg.confirm-icon g {
   animation: fillanim 300ms ease-in forwards 2.4s;
 }
 
-.popup * {
+.nuxtalert .popup * {
   font-family: "Avenir Next", "Helvetica Neue", Helvetica, sans-serif;
 }
 
-.default,
-.dark,
-.borderless {
+.nuxtalert.default,
+.nuxtalert.dark,
+.nuxtalert.borderless {
   .popup h1 {
     font-weight: normal;
     font-size: 1.9rem;
@@ -218,8 +218,8 @@ $iconSize: 110px;
   }
 }
 
-.default,
-.dark {
+.nuxtalert.default,
+.nuxtalert.dark {
   .shader {
     position: fixed;
     z-index: 90;
@@ -247,7 +247,7 @@ $iconSize: 110px;
   }
 }
 
-.default .popup {
+.nuxtalert.default .popup {
   position: fixed;
   z-index: 1000;
   top: 50%;
@@ -279,7 +279,7 @@ $iconSize: 110px;
   }
 }
 
-.dark .popup {
+.nuxtalert.dark .popup {
   position: fixed;
   z-index: 1000;
   top: 50%;
@@ -312,7 +312,7 @@ $iconSize: 110px;
   }
 }
 
-.borderless .shader {
+.nuxtalert.borderless .shader {
   position: fixed;
   z-index: 990;
   top: 0;
@@ -333,7 +333,7 @@ $iconSize: 110px;
   }
 }
 
-.borderless .popup {
+.nuxtalert.borderless .popup {
   width: 55%;
   box-sizing: border-box;
   background-color: transparent;
@@ -357,8 +357,8 @@ $iconSize: 110px;
   }
 }
 
-.borderless .popup,
-.dark .popup {
+.nuxtalert.borderless .popup,
+.nuxtalert.dark .popup {
   h1 {
     color: #e1e1e1;
   }
@@ -368,7 +368,7 @@ $iconSize: 110px;
   }
 }
 
-.container-buttons button {
+.nuxtalert .container-buttons button {
   height: 45px;
   color: #fff;
   border-radius: 5px;
@@ -391,7 +391,7 @@ $iconSize: 110px;
 $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default-deny-button-color, 'cancel-button' $default-cancel-button-color;
 
 @each $button in $buttons {
-  .#{nth($button, 1)} {
+  .nuxtalert .#{nth($button, 1)} {
     background-color: nth($button, 2);
 
     &:hover {
@@ -409,18 +409,18 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
   }
 }
 
-.disabled {
+.nuxtalert .disabled {
   pointer-events: none;
   cursor: default;
 }
 
-.container-icon,
-.container-icon .confirm-icon {
+.nuxtalert .container-icon,
+.nuxtalert .container-icon .confirm-icon {
   width: $iconSize;
   height: $iconSize;
 }
 
-.fade-icon {
+.nuxtalert .fade-icon {
   animation: fadeIn 500ms forwards 1 ease-out;
 }
 
@@ -429,7 +429,7 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
   to { opacity: 1 }
 }
 
-.rounded-icon {
+.nuxtalert .rounded-icon {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -445,7 +445,7 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
   }
 }
 
-.warning-icon {
+.nuxtalert .warning-icon {
   border: 5px solid $warning-border-color;
 
   svg {
@@ -457,7 +457,7 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
   }
 }
 
-.error-icon {
+.nuxtalert .error-icon {
   border: 5px solid $error-border-color;
 
   svg {
@@ -471,7 +471,7 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
   }
 }
 
-.question-icon {
+.nuxtalert .question-icon {
   border: 5px solid $question-border-color;
 
   svg {
@@ -488,7 +488,7 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
   }
 }
 
-.info-icon {
+.nuxtalert .info-icon {
   border: 5px solid $info-border-color;
 
   svg {
