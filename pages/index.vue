@@ -33,6 +33,13 @@ function showWarning() {
   nuxtAlert.fire({
     title: "Test warning",
     icon: "warning",
+    showLoaderOnConfirm: true,
+    then: async (decision) => {
+      if (decision.confirmed) {
+        await sleep(2000);
+        console.log('slept for 2 seconds after confirmation');
+      }
+    },
   });
 }
 

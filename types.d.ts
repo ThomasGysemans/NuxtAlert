@@ -20,7 +20,7 @@ namespace NuxtAlert {
     }
 
     interface Handlers {
-        close: (decision:CloseDecision, returnValue?: unknown) => void;
+        close: (decision:CloseDecision, returnValue?: unknown) => Promise<void>;
         isOpen: () => boolean;
     }
 

@@ -29,7 +29,7 @@ async function onConfirm() {
     state.loadingConfirm = true;
   }
   const r = await nuxtAlert.getOptions().onConfirm?.();
-  nuxtAlert.handlers.close({ confirmed: true, denied: false, cancelled: false }, r);
+  await nuxtAlert.handlers.close({ confirmed: true, denied: false, cancelled: false }, r);
   state.loadingConfirm = false;
 }
 
@@ -39,7 +39,7 @@ async function onCancel() {
     state.loadingCancel = true;
   }
   const r = await nuxtAlert.getOptions().onCancel?.();
-  nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: true }, r);
+  await nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: true }, r);
   state.loadingCancel = false;
 }
 
@@ -49,7 +49,7 @@ async function onDeny() {
     state.loadingDeny = true;
   }
   const r = await nuxtAlert.getOptions().onDeny?.();
-  nuxtAlert.handlers.close({ confirmed: false, denied: true, cancelled: false }, r);
+  await nuxtAlert.handlers.close({ confirmed: false, denied: true, cancelled: false }, r);
   state.loadingDeny = false;
 }
 
@@ -65,10 +65,10 @@ function getFocusableElements() {
   ) as HTMLElement[];
 }
 
-function keyboardHandler(e:KeyboardEvent) {
+async function keyboardHandler(e:KeyboardEvent) {
   if (!nuxtAlert.handlers.isOpen()) return;
   if (e.key === "Esc" || e.key === "Escape") {
-    nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: false });
+    await nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: false });
   } else if (e.key === "Tab") {
     const allFocusable = getFocusableElements();
     if (allFocusable.length > 0) {

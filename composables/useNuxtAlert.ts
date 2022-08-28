@@ -1,9 +1,8 @@
 const useNuxtAlert = () => {
     const popup = useState<NuxtAlert.Options & {open:boolean}>("nuxtAlert", () => ({ open: false }));
-    const close = (decision:NuxtAlert.CloseDecision, returnValue?:unknown) => {
-        const then = popup.value.then;
+    const close = async (decision:NuxtAlert.CloseDecision, returnValue?:unknown) => {
+        await popup.value.then?.(decision, returnValue);
         popup.value = { open: false };
-        then?.(decision, returnValue);
     };
     const isOpen = () => popup.value.open === true;
     const getOptions = () => popup.value;
