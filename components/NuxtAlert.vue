@@ -144,6 +144,9 @@ watchEffect(() => {
       </div>
       <h1 id="alert-title">{{ nuxtAlert.getOptions().title ?? '' }}</h1>
       <p>{{ nuxtAlert.getOptions().message ?? '' }}</p>
+      <div v-if="nuxtAlert.getOptions().customElement" class="container-custom-element">
+        <slot />
+      </div>
       <div class="container-buttons">
         <button v-if="nuxtAlert.getOptions().showConfirmButton ?? true" class="confirm-button" :class="isLoading() ? 'disabled' : ''" :aria-disabled="isLoading()" @click="onConfirm"><LoadingNuxtAlert v-if="state.loadingConfirm" /><span v-else>{{ nuxtAlert.getOptions().confirmButtonText ?? 'OK' }}</span></button>
         <button v-if="nuxtAlert.getOptions().showDenyButton ?? false" class="deny-button" :class="isLoading() ? 'disabled' : ''" :aria-disabled="isLoading()" @click="onDeny"><LoadingNuxtAlert v-if="state.loadingDeny" /><span v-else>{{ nuxtAlert.getOptions().denyButtonText ?? 'Deny' }}</span></button>
@@ -334,7 +337,7 @@ $iconSize: 110px;
 }
 
 .nuxtalert.borderless .popup {
-  width: 55%;
+  width: 40%;
   box-sizing: border-box;
   background-color: transparent;
   position: fixed;
@@ -552,5 +555,10 @@ $buttons: 'confirm-button' $default-confirm-button-color, 'deny-button' $default
     opacity: 1;
     transform: rotateY(0deg);
   }
+}
+
+.container-custom-element {
+  width: 100%;
+  margin-bottom: 20px;
 }
 </style>

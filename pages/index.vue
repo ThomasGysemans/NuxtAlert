@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const nuxtAlert = useNuxtAlert();
 const state = reactive({
-  theme: 'default',
+  theme: 'default', // 'default', 'dark', 'borderless'
 })
 
 function sleep(ms:number) {
@@ -19,7 +19,7 @@ function showSuccess() {
     onConfirm: async () => {
       await sleep(1500);
     },
-    then: (decision, r) => {
+    then: (decision) => {
       nuxtAlert.fire({
         title: decision.confirmed ? 'Confirmed' : (decision.denied ? 'Denied' : 'Cancelled'),
         message: "Again, another message to confirm the decision you already confirmed by clicking on the button",
@@ -63,11 +63,23 @@ function showInfo() {
     icon: "info",
   });
 }
+
+const exampleInput = ref('');
+function showInput() {
+  nuxtAlert.fire({
+    title: "Test with text input",
+    icon: "question",
+    message: "What's your name?",
+    customElement: true,
+  });
+}
 </script>
 
 <template>
   <div>
-    <NuxtAlert :theme="state.theme" />
+    <NuxtAlert :theme="state.theme">
+      <input class="input" :class="state.theme" type="text" placeholder="Your name" v-model="exampleInput" />
+    </NuxtAlert>
     <div class="body">
       <h1>NuxtAlert for <span class="nuxt">NuxtJS 3</span></h1>
       <div>
@@ -83,6 +95,7 @@ function showInfo() {
         <button @click="showError">Error Message</button>
         <button @click="showQuestion">Question Message</button>
         <button @click="showInfo">Info Message</button>
+        <button @click="showInput">With input</button>
       </div>
       <span class="inspired-by">Inspired by <a href="https://sweetalert2.github.io/" target="_blank">SweetAlert2</a>, but not available for Nuxt3</span>
     </div>
@@ -155,5 +168,64 @@ button:hover {
   transform: translateX(-50%);
   text-align: center;
   font-size: 0.9em;
+}
+
+/* for theme: default */
+.input.default {
+  width: 100%;
+  height: 50px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: inherit;
+  outline: none;
+  font-size: 1.0em;
+}
+.input.default:focus {
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 6%), 0 0 0 3px rgb(100 150 200 / 50%);
+}
+
+/* for theme: dark */
+.input.dark {
+  width: 100%;
+  height: 50px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  background-color: #323234;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: inherit;
+  outline: none;
+  font-size: 1.0em;
+  color: #d9d9d9;
+}
+.input.dark:focus {
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 6%), 0 0 0 3px rgb(100 150 200 / 50%);
+}
+.input.borderless::placeholder {
+  color: #d9d9d9;
+}
+
+/* for theme: borderless */
+.input.borderless {
+  width: 100%;
+  height: 50px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  background-color: rgba(73, 94, 125, 0.99);
+  border-radius: 5px;
+  padding: 10px;
+  font-family: inherit;
+  outline: none;
+  color: #d9d9d9;
+  font-size: 1.0em;
+}
+.input.borderless:focus {
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 6%), 0 0 0 3px rgb(100 150 200 / 50%);
+}
+.input.borderless::placeholder {
+  color: #d9d9d9;
 }
 </style>

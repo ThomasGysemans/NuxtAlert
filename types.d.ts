@@ -17,6 +17,7 @@ namespace NuxtAlert {
         showLoaderOnConfirm?: boolean;
         showLoaderOnDeny?: boolean;
         showLoaderOnCancel?: boolean;
+        customElement?: boolean;
     }
 
     interface Handlers {
