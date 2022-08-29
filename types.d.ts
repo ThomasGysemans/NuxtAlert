@@ -13,7 +13,6 @@ namespace NuxtAlert {
         onConfirm?: () => void;
         onDeny?: () => void;
         onCancel?: () => void;
-        then?: (decision:CloseDecision, returnValue?: unknown) => void;
         showLoaderOnConfirm?: boolean;
         showLoaderOnDeny?: boolean;
         showLoaderOnCancel?: boolean;
@@ -21,19 +20,25 @@ namespace NuxtAlert {
     }
 
     interface Handlers {
-        close: (decision:CloseDecision, returnValue?: unknown) => Promise<void>;
+        close: (decision: CloseDecision, returnValue?: unknown, error?: Error) => void;
         isOpen: () => boolean;
-    }
-
-    interface Config {
-        fire: (options: Options) => void;
-        handlers: Handlers;
-        getOptions: () => Options;
+        clearStack: () => void;
     }
 
     interface CloseDecision {
         confirmed: boolean;
         denied: boolean;
         cancelled: boolean;
+    }
+
+    interface PromiseResult extends CloseDecision {
+        returnValue?: unknown;
+        error?: Error;
+    }
+
+    interface Config {
+        fire: (options: Options) => Promise<PromiseResult>;
+        handlers: Handlers;
+        getOptions: () => Options;
     }
 }

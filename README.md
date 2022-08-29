@@ -1,6 +1,6 @@
 # NuxtAlert 
 
-A `SweetAlert2` alternative for NuxtJS 3.
+A `SweetAlert2` alternative for NuxtJS 3 to show beautiful interactive popups.
 
 This is not a package, see the source code to understand how it works if necessary. Copy-paste what needs to be used for your project and see the documentation here.
 
@@ -8,7 +8,7 @@ This is not a package, see the source code to understand how it works if necessa
 
 See `pages/index.vue` for an example.
 
-If you want to use `NuxtAlert` in a page, use the component `NuxtAlert` like that:
+If you want to use `NuxtAlert` in a page, use the `NuxtAlert` component like that:
 
 ```vue
 <template>
@@ -63,43 +63,10 @@ interface Options {
     onConfirm?: () => void;
     onDeny?: () => void;
     onCancel?: () => void;
-    then?: (decision:CloseDecision) => void;
     showLoaderOnConfirm?: boolean; // false by default
     showLoaderOnDeny?: boolean; // false by default
     showLoaderOnCancel?: boolean; // false by default
     customElement?: boolean; // false by default
-}
-```
-
-As this method doesn't return a promise unlike `Swal`, if you want to display another alert after a first one, use the `then` property:
-
-```typescript
-nuxtAlert.fire({
-    title: "Do you like banana?",
-    showConfirmButton: true,
-    showDenyButton: true,
-    showCancelButton: true,
-    then: (decision:NuxtAlert.CloseDecision) => {
-        if (decision.confirmed) {
-            console.log("confirmed");
-        } else if (decision.denied) {
-            console.log("denied");
-        } else if (decision.cancelled) {
-            console.log("cancelled");
-        } else {
-            console.log("the popup has 'allowOutsideClick' set to true, and the user clicked outside of the popup.");
-        }
-    },
-});
-```
-
-Fairly straightforward, `CloseDecision` is defined like this:
-
-```typescript
-interface CloseDecision {
-    confirmed: boolean;
-    denied: boolean;
-    cancelled: boolean;
 }
 ```
 
@@ -127,17 +94,16 @@ function sendMessage() {
       await sleep(5000);
       console.log("the data arrived after 5 seconds!");
       return true;
-    },
-    then: (decision, returnValue) => {
-      if (decision.confirmed && returnValue === true) {
-        nuxtAlert.fire({
-          title: "Success",
-          message: "The data was sent successfully according to the return value of `onConfirm` method.",
-          icon: "success"
-        });
-      }
     }
-  });
+  }).then((result) => {
+    if (result.confirmed && result.returnValue === true) {
+      nuxtAlert.fire({
+        title: "Success",
+        message: "The data was sent successfully according to the return value of `onConfirm` method.",
+        icon: "success"
+      });
+    }
+  })
 }
 </script>
 
@@ -151,12 +117,122 @@ function sendMessage() {
 </template>
 ```
 
+> **NOTE**: The `fire` method returns a `Promise` which value follows this interface:
+
+```typescript
+interface PromiseResult {
+    returnValue?: unknown;
+    confirmed: boolean;
+    denied: boolean;
+    cancelled: boolean;
+}
+```
+
+Using `async/await` feature, you can chain several popups asynchronously like this:
+
+```typescript
+function sleep(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+nuxtAlert.fire({
+    title: "Do you like banana?",
+    icon: "question",
+    showConfirmButton: true,
+    showDenyButton: true,
+    showCancelButton: true,
+    showLoaderOnConfirm: true,
+    onConfirm: async () => {
+        await sleep(5000);
+        const result = await nuxtAlert.fire({
+            title: "You've been sleeping for 5 seconds",
+            icon: "warning"
+        });
+        if (result.confirmed) {
+            console.log("The second popup was confirmed");
+        } else if (result.denied) {
+            console.log("The second popup was denied");
+        } else if (result.cancelled) {
+            console.log("The second popup was cancelled");
+        }
+    },
+});
+```
+
+You can use `then` and `catch` methods if you prefer:
+
+```typescript
+function sleep(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+nuxtAlert.fire({
+    title: "Do you like banana?",
+    icon: "question",
+    showConfirmButton: true,
+    showDenyButton: true,
+    showCancelButton: true,
+    showLoaderOnConfirm: true,
+    onConfirm: async () => {
+        await sleep(5000);
+    },
+}).then((result) => {
+    if (result.confirmed) {
+        nuxtAlert.fire({
+            title: "You've been sleeping for 5 seconds",
+            icon: "warning"
+        });
+    }
+});
+```
+
+The promise will be resolved once the user clicks on a button, or clicks outside the popup.
+
+## Error handling
+
+As `fire` returns a promise, you can easily catch the errors:
+
+```vue
+<script setup lang="ts">
+const nuxtAlert = useNuxtAlert();
+
+function show() {
+  nuxtAlert.fire({
+    title: 'Do you like bananas?',
+    icon: "question",
+    showDenyButton: true,
+    onConfirm: () => {
+      console.log("I don't care");
+    },
+    onDeny: () => {
+      throw new Error("Robot detected");
+    },
+  }).catch((result) => {
+    console.log("People clicked on", result.confirmed ? 'Confirm' : 'Deny'); // will be 'Deny'
+    console.log("which threw the following error :", result.error); // which message is 'Robot detected'
+  });
+}
+</script>
+
+<template>
+  <div>
+    <NuxtAlert />
+    <main>
+      <button @click="show">THE GREAT QUESTION</button>
+    </main>
+  </div>
+</template>
+```
+
+A much more complex example is available at `/pages/index.vue`.
+
 ## Some other details
 
-The custom hook `useNuxtAlert` comes with `handlers`. From `nuxtAlert.handlers` there are 2 methods:
+The custom hook `useNuxtAlert` comes with `handlers`. From `nuxtAlert.handlers` there are 3 methods:
 
 - `isOpen()`
 - `close(decision:CloseDecision, returnValue?:unknown)`
+- `clearStack()` to impede the next promises to be resolved.
 
 > **NOTE**: Once the popup is closed, the options you previously gave via `fire()` are deleted.
 

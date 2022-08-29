@@ -8,6 +8,11 @@ function sleep(ms:number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/*
+Here is a complex example on how to chain the popups.
+The system is based on a stack of promises created every time you call `fire`.
+This system allows you to chain as many popups as you need for your project while keeping the right order of callbacks.
+ */
 function showSuccess() {
   nuxtAlert.fire({
     title: "Success Message",
@@ -17,32 +22,56 @@ function showSuccess() {
     showCancelButton: true,
     showLoaderOnConfirm: true,
     onConfirm: async () => {
-      await sleep(1500);
-    },
-    then: (decision) => {
-      nuxtAlert.fire({
-        title: decision.confirmed ? 'Confirmed' : (decision.denied ? 'Denied' : 'Cancelled'),
-        message: "Again, another message to confirm the decision you already confirmed by clicking on the button",
-        icon: "success",
+      await sleep(500);
+      await nuxtAlert.fire({
+        title: "Wait, are you sure?",
+        icon: "warning",
+        showLoaderOnConfirm: true,
+        onConfirm: async () => {
+          await sleep(500);
+          throw new Error("nested error");
+          // An error here will also be caught by the `caught` method
+        },
       });
+      console.log("confirmed once again");
     },
+    onDeny: () => {
+      throw new Error("Denied !!!!");
+    }
+  }).then((result) => {
+    nuxtAlert.fire({
+      title: result.confirmed ? "Confirmed !" : (result.denied ? "Denied" : "Cancelled"),
+      message: "Again, another message to confirm the decision you already confirmed by clicking on the button",
+      icon: "success",
+    });
+  }).catch((result) => {
+    console.log("caught", result.error);
+    nuxtAlert.fire({
+      title: "Erreur !",
+      message: result.error.message,
+      icon: "error",
+    });
   });
 }
 
+/*
+Very simple warning that needs to do asynchronous stuff on confirm.
+ */
 function showWarning() {
   nuxtAlert.fire({
     title: "Test warning",
     icon: "warning",
     showLoaderOnConfirm: true,
-    then: async (decision) => {
-      if (decision.confirmed) {
-        await sleep(2000);
-        console.log('slept for 2 seconds after confirmation');
-      }
+    onConfirm: async () => {
+      await sleep(2000);
+      console.log('slept for 2 seconds after confirmation');
     },
   });
 }
 
+/*
+The most basic example
+ */
 function showError() {
   nuxtAlert.fire({
     title: "Test error",
@@ -50,11 +79,23 @@ function showError() {
   });
 }
 
-function showQuestion() {
-  nuxtAlert.fire({
+/*
+Remember `fire` returns a promise, therefore you have two ways to get the response:
+- via `then` property as showed in the success example
+- by awaiting the function asynchronously
+The response is an object: { confirmed: boolean, denied: boolean, cancelled: boolean, returnValue?: unknown }
+ */
+async function showQuestion() {
+  const response = await nuxtAlert.fire({
     title: "Test question",
     icon: "question",
+    showLoaderOnConfirm: true,
+    onConfirm: async () => {
+      await sleep(1000);
+      return true;
+    },
   });
+  console.log("response =", response);
 }
 
 function showInfo() {
@@ -64,6 +105,10 @@ function showInfo() {
   });
 }
 
+/*
+Create your own input and reference.
+Set this input as a custom element with `customElement` property.
+ */
 const exampleInput = ref('');
 function showInput() {
   nuxtAlert.fire({
@@ -206,6 +251,7 @@ button:hover {
   box-shadow: inset 0 1px 1px rgb(0 0 0 / 6%), 0 0 0 3px rgb(100 150 200 / 50%);
 }
 .input.borderless::placeholder {
+  opacity: 0.5;
   color: #d9d9d9;
 }
 
@@ -227,6 +273,7 @@ button:hover {
   box-shadow: inset 0 1px 1px rgb(0 0 0 / 6%), 0 0 0 3px rgb(100 150 200 / 50%);
 }
 .input.borderless::placeholder {
+  opacity: 0.5;
   color: #d9d9d9;
 }
 </style>

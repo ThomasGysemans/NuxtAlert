@@ -28,9 +28,16 @@ async function onConfirm() {
   if (nuxtAlert.getOptions().showLoaderOnConfirm) {
     state.loadingConfirm = true;
   }
-  const r = await nuxtAlert.getOptions().onConfirm?.();
-  await nuxtAlert.handlers.close({ confirmed: true, denied: false, cancelled: false }, r);
-  state.loadingConfirm = false;
+  let returnValue;
+  let error;
+  try {
+    returnValue = await nuxtAlert.getOptions().onConfirm?.();
+  } catch (e) {
+    error = e;
+  } finally {
+    nuxtAlert.handlers.close({ confirmed: true, denied: false, cancelled: false }, returnValue, error);
+    state.loadingConfirm = false;
+  }
 }
 
 async function onCancel() {
@@ -38,9 +45,16 @@ async function onCancel() {
   if (nuxtAlert.getOptions().showLoaderOnCancel) {
     state.loadingCancel = true;
   }
-  const r = await nuxtAlert.getOptions().onCancel?.();
-  await nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: true }, r);
-  state.loadingCancel = false;
+  let returnValue;
+  let error;
+  try {
+    returnValue = await nuxtAlert.getOptions().onCancel?.();
+  } catch (e) {
+    error = e;
+  } finally {
+    nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: true }, returnValue, error);
+    state.loadingCancel = false;
+  }
 }
 
 async function onDeny() {
@@ -48,9 +62,16 @@ async function onDeny() {
   if (nuxtAlert.getOptions().showLoaderOnDeny) {
     state.loadingDeny = true;
   }
-  const r = await nuxtAlert.getOptions().onDeny?.();
-  await nuxtAlert.handlers.close({ confirmed: false, denied: true, cancelled: false }, r);
-  state.loadingDeny = false;
+  let returnValue;
+  let error;
+  try {
+    returnValue = await nuxtAlert.getOptions().onDeny?.();
+  } catch (e) {
+    error = e;
+  } finally {
+    nuxtAlert.handlers.close({ confirmed: false, denied: true, cancelled: false }, returnValue, error);
+    state.loadingDeny = false;
+  }
 }
 
 function isLoading() {
@@ -65,10 +86,10 @@ function getFocusableElements() {
   ) as HTMLElement[];
 }
 
-async function keyboardHandler(e:KeyboardEvent) {
+function keyboardHandler(e:KeyboardEvent) {
   if (!nuxtAlert.handlers.isOpen()) return;
   if (e.key === "Esc" || e.key === "Escape") {
-    await nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: false });
+    nuxtAlert.handlers.close({ confirmed: false, denied: false, cancelled: false });
   } else if (e.key === "Tab") {
     const allFocusable = getFocusableElements();
     if (allFocusable.length > 0) {
@@ -92,6 +113,9 @@ watchEffect(() => {
     const popup = document.querySelector(".popup");
     if (popup) {
       if (nuxtAlert.handlers.isOpen()) {
+        state.loadingConfirm = false;
+        state.loadingDeny = false;
+        state.loadingCancel = false;
         const currentlyFocusedElement = document.querySelector(":focus") as HTMLElement;
         if (currentlyFocusedElement && !popup.contains(currentlyFocusedElement)) {
           activeElement = currentlyFocusedElement;
