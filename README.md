@@ -67,6 +67,7 @@ interface Options {
     showLoaderOnConfirm?: boolean; // false by default
     showLoaderOnDeny?: boolean; // false by default
     showLoaderOnCancel?: boolean; // false by default
+    customElement?: boolean; // false by default
 }
 ```
 
@@ -179,6 +180,37 @@ There are 3 themes:
 * `default`
 * `dark`
 * `borderless`
+
+## Inputs
+
+If you want to display custom elements such as inputs, use `customElement` property:
+
+```vue
+<script setup lang="ts">
+const nuxtAlert = useNuxtAlert();
+const inputValue = ref('');
+
+function show() {
+  nuxtAlert.fire({
+    title: "What's your name",
+    message: "I need this information",
+    icon: "question",
+    customElement: true, // important
+  });
+}
+</script>
+
+<template>
+  <div>
+    <NuxtAlert theme="borderless">
+      <input v-model="inputValue" />
+    </NuxtAlert>
+    <button @click="show">Show popup</button>
+  </div>
+</template>
+```
+
+You will have to style these elements on your own. Examples are available in this repo at `/pages/index.vue`.
 
 ## License
 

@@ -337,7 +337,8 @@ $iconSize: 110px;
 }
 
 .nuxtalert.borderless .popup {
-  width: 40%;
+  width: 75%;
+  max-width: 400px;
   box-sizing: border-box;
   background-color: transparent;
   position: fixed;
