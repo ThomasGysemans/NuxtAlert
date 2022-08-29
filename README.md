@@ -232,7 +232,7 @@ The custom hook `useNuxtAlert` comes with `handlers`. From `nuxtAlert.handlers` 
 
 - `isOpen()`
 - `close(decision:CloseDecision, returnValue?:unknown)`
-- `clearStack()` to impede the next promises to be resolved.
+- `clearStack()` to impede the next promises to be resolved or rejected.
 
 > **NOTE**: Once the popup is closed, the options you previously gave via `fire()` are deleted.
 
